@@ -3,6 +3,16 @@
 header("Content-Type: application/json");
 include_once "../database.php";
 
+
+require_once "../vendor/autoload.php";
+
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+
+$secret_key = "thisishacchicosecretkey_1995"; 
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 

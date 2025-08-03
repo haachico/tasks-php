@@ -7,6 +7,9 @@ require_once "../vendor/autoload.php";
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
+$secret_key = "thisishacchicosecretkey_1995"; 
+
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 $username = $data['username'] ?? '';
@@ -39,7 +42,6 @@ if (!$user || !password_verify($password, $user['password'])) {
 }
 
 // JWT token generation
-$secret_key = bin2hex(random_bytes(32)); // Generate a secure random 64-character key
 $issuedAt = time();
 $expirationTime = $issuedAt + 600; // Token valid for 10 minutes
 $payload = [

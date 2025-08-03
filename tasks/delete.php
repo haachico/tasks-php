@@ -2,7 +2,11 @@
 header("Content-Type: application/json");
 include_once "../database.php";
 
+
+$secret_key = "thisishacchicosecretkey_1995"; 
+
 $data = json_decode(file_get_contents("php://input"), true);
+
 
 // print_r($data); // Debugging line to check input data
 

@@ -3,14 +3,49 @@ header("Content-Type: application/json");
 include_once "../database.php";
 
 
+require_once "../vendor/autoload.php";
+
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+
+$secret_key = "thisishacchicosecretkey_1995"; 
+
+
 try {
 
     $db = new Database();
     $conn = $db->getConnection();
 
-    $query = "SELECT * FROM tasks";
+    //i will have to get the user ID from the JWT token
 
+  $headers = getallheaders();
+  $jwt = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
+    
+
+
+//   print_r($jwt);
+//     exit;
+    if ($jwt) {
+        try {
+            $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+            $user_id = $decoded->data->id;
+        } catch (Exception $e) {
+            echo json_encode(["message" => "Invalid token"]);
+            exit;
+        }
+    } else {
+        echo json_encode(["message" => "Authorization header not found"]);
+        exit;
+    }
+
+    // print_r($user_id);
+    // exit;
+
+    $query = "SELECT * FROM tasks WHERE user_id = :user_id";
     $stmt = $conn->prepare($query);
+    $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
 
     $tasks = [];
