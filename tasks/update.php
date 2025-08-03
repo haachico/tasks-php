@@ -11,7 +11,30 @@ use Firebase\JWT\Key;
 
 $secret_key = "thisishacchicosecretkey_1995";
 
+
 $data = json_decode(file_get_contents("php://input"), true);
+
+
+  $headers = getallheaders();
+  $jwt = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
+
+
+    if ($jwt) {
+        try {
+            $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));        
+            $user_id = $decoded->data->id;
+        } catch (Exception $e) {
+            http_response_code(401);
+            echo json_encode(["message" => "Invalid token"]);
+            exit;
+        }
+    } else {
+        http_response_code(401);
+        echo json_encode(["message" => "Authorization header not found"]);
+        exit;
+    }
+    
+
 
 try {
  
@@ -30,13 +53,15 @@ try {
         exit();
     }
 
-    $query = "UPDATE tasks SET title = :title, description = :description WHERE id = :id";
+
+    $query = "UPDATE tasks SET title = :title, description = :description WHERE id = :id AND user_id = :user_id";
     $stmt = $conn->prepare($query);
 
     $params = [
         ':id' => intval($data['id']),
         ':title' => $data['title'] ?? null,
-        ':description' => $data['description'] ?? null
+        ':description' => $data['description'] ?? null,
+        ':user_id' => $user_id
     ];
 
     if($stmt->execute($params)) {
