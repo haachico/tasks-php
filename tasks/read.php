@@ -28,10 +28,11 @@ try {
 //   print_r($jwt);
 //     exit;
     if ($jwt) {
-        try {
+        try {   
             $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
             $user_id = $decoded->data->id;
         } catch (Exception $e) {
+             http_response_code(401);
             echo json_encode(["message" => "Invalid token"]);
             exit;
         }
