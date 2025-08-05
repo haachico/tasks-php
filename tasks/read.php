@@ -24,9 +24,9 @@ try {
   $jwt = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
     
 
+  $filterType  = file_get_contents("php://input");
+  $filterType = json_decode($filterType, true);
 
-//   print_r($jwt);
-//     exit;
     if ($jwt) {
         try {   
             $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
@@ -45,6 +45,15 @@ try {
     // exit;
 
     $query = "SELECT * FROM tasks WHERE user_id = :user_id";
+
+
+    if (isset($filterType['filter']) && $filterType['filter'] === 'completed') {
+        $query = $query . " AND completed = 1";
+    }
+    if (isset($filterType['filter']) && $filterType['filter'] === 'pending') {
+        $query = $query . " AND completed = 0";
+    }
+    
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
